@@ -59,9 +59,6 @@ const Home = () => {
       <TabContent value={value} tab='sendcoin'>
         <SendCoinForm />
       </TabContent>
-      <TabContent value={value} tab='sendcoin'>
-        <SendCoinForm />
-      </TabContent>
       <TabContent value={value} tab='getpair'>
         <GetPairForm />
       </TabContent>
