@@ -32,13 +32,19 @@ export type ResultObject = {
   gasUsed: number
   txhash: string
   data: string
-  schema: string
+  schema?: string
 }
 
-export const ResultRender: React.FC<ResultObject> = ({ height, gasUsed, txhash, data, schema }) => {
-  const obi = new Obi(schema)
-  // const buffer = Buffer.from(data, "hex")
-  // const decodedData = obi.decodeOutput(buffer)
+export const ResultRender: React.FC<ResultObject> = ({ height, gasUsed, txhash, data, schema = "" }) => {
+  let decodedData;
+  if (schema) {
+    // const obi = new Obi(schema)
+    // const result = "\\x000000010000000000000fd2"
+    // const buffer = Buffer.from(result)
+    // console.log(buffer)
+    // decodedData = obi.decodeOutput(buffer)
+    // console.log(decodedData)
+  }
   return (
     <Container>
       <RowDiv>

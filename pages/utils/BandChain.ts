@@ -78,3 +78,60 @@ export const requestCryptoPrice = async ({
   setLoading(false)
   return sendTx
 }
+
+interface SendCoinProps {
+  amount: string
+  receiver: string
+}
+export const sendCoin = async ({
+  amount,
+  receiver
+}: SendCoinProps,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>) => {
+  setLoading(true)
+  const sendAmount = new Coin()
+  sendAmount.setDenom("uband")
+  sendAmount.setAmount(amount)
+
+  const msg = new Message.MsgSend(sender, receiver, [sendAmount])
+  const chainId = await client.getChainId()
+  const account = await client.getAccount(sender)
+
+  let feeCoin = new Coin()
+  feeCoin.setDenom("uband")
+  feeCoin.setAmount("1000")
+
+  const fee = new Fee()
+  fee.setAmountList([feeCoin])
+  fee.setGasLimit(1000000)
+
+  const tx = new Transaction()
+    .withMessages(msg)
+    .withAccountNum(account.accountNumber)
+    .withSequence(account.sequence)
+    .withChainId(chainId)
+    .withFee(fee)
+
+  const txSignData = tx.getSignDoc(pubKey)
+  const signature = privKey.sign(txSignData)
+  const signedTx = tx.getTxData(signature, pubKey)
+
+  const response = await client.sendTxBlockMode(signedTx)
+  setLoading(false)
+  return response
+}
+
+interface GetPairProps {
+  askCount: number
+  minCount: number
+  pairs: string[]
+}
+export const getPairRef = async (
+  { askCount, minCount, pairs }: GetPairProps,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>) => {
+  setLoading(true)
+  const response = await client.getReferenceData(pairs, minCount, askCount)
+  setLoading(false)
+  console.log(response)
+  return JSON.stringify(response, null, 2)
+}

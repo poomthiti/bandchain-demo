@@ -1,161 +1,21 @@
-import React, { Dispatch, SetStateAction, useState } from 'react'
+import React, { useState } from 'react'
 import styled from '@emotion/styled'
-import { MenuItem, TextField, Typography, Select, Checkbox, ListItemText, Button, CircularProgress } from '@mui/material'
 import { Formik, ErrorMessage } from 'formik'
 import { requestCryptoPrice } from '../utils/BandChain'
-import { ResultRender, ResultObject } from '.'
+import {
+  ResultRender,
+  ResultObject,
+  InputField,
+  SubmitSection,
+  CountSelect,
+  SymbolSelect
+} from '.'
 
-const InputLabel = styled(Typography)`
-  font-size: 12px;
-  font-weight: 600;
-  color: #7d7d7d;
-  margin-bottom: 4px;
-`
-const FieldContainer = styled.div`
-  margin-bottom: 8px;
-`
-const SubmitButton = styled(Button)`
-  text-transform: capitalize;
-  width: 140px;
-  font-size: 12px;
-  font-weight: 600;
-  margin-right: 24px;
-`
-const RowDiv = styled.div`
-  display: flex;
-  align-items: center;
-  margin-top: 12px;
-`
 const CountDiv = styled.div`
   display: flex;
   flex-direction: row;
 `
-
-interface FieldProps {
-  label: string
-  value: number | string
-  setFieldValue: (val: number | string) => void
-}
-
-const InputField: React.FC<FieldProps> = ({ label, value, setFieldValue }) => {
-  return (
-    <FieldContainer>
-      <InputLabel>{label}</InputLabel>
-      <TextField
-        sx={{ width: '60%' }}
-        fullWidth
-        value={value}
-        type={label === "Client ID" ? "text" : "number"}
-        color="secondary"
-        onChange={(event) => setFieldValue(event.target.value)}
-        inputProps={{
-          style: {
-            padding: '8px 10px',
-            fontSize: 14,
-            height: 'auto',
-          }
-        }}
-      />
-    </FieldContainer>
-  )
-}
-
 const symbolList = ['BTC', 'ETH', 'BNB', 'SOL', 'ADA', 'XRP', 'DOT', 'DOGE', 'SHIB', 'MATIC', 'LTC']
-
-interface SymbolSelectProps {
-  setSymbol: Dispatch<SetStateAction<string[] | string>>
-  symbols: string[] | string
-}
-
-const SymbolSelect: React.FC<SymbolSelectProps> = ({ setSymbol, symbols }) => {
-  return (
-    <FieldContainer>
-      <InputLabel>
-        Symbols
-      </InputLabel>
-      <Select
-        sx={{ width: '60%' }}
-        multiple
-        fullWidth
-        value={symbols}
-        color="secondary"
-        SelectDisplayProps={{
-          style: {
-            fontSize: 14,
-            padding: '8px 10px',
-
-          },
-        }}
-        onChange={(event) => {
-          const { target: { value } } = event
-          setSymbol(value)
-        }}
-        renderValue={(selected) => JSON.stringify(selected)}
-        MenuProps={{
-          PaperProps: {
-            style: {
-              maxHeight: (54 * 5) + 8
-            }
-          }
-        }}
-      >
-        {symbolList.map(item => (
-          <MenuItem key={item} value={item}>
-            <Checkbox checked={symbols.indexOf(item) > -1} color="secondary" />
-            <ListItemText primary={item} />
-          </MenuItem>
-        ))}
-      </Select>
-    </FieldContainer>
-  )
-}
-
-interface CountSelectProps {
-  setFieldValue: (val: number) => void
-  count: number
-  label: string
-}
-const askCountOption = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-
-const CountSelect: React.FC<CountSelectProps> = ({ setFieldValue, count, label }) => {
-  const optionArr = label === "Ask Count" ? askCountOption : [1]
-  return (
-    <FieldContainer>
-      <InputLabel>
-        {label}
-      </InputLabel>
-      <Select
-        sx={{ width: '16vw', marginRight: 4, minWidth: '120px', maxWidth: '170px' }}
-        fullWidth
-        value={count}
-        color="secondary"
-        SelectDisplayProps={{
-          style: {
-            fontSize: 14,
-            padding: '8px 10px',
-          },
-        }}
-        onChange={(event) => {
-          const { target: { value } } = event
-          setFieldValue(Number(value))
-        }}
-        MenuProps={{
-          PaperProps: {
-            style: {
-              maxHeight: (36 * 8) + 8
-            }
-          }
-        }}
-      >
-        {optionArr.map(item => (
-          <MenuItem key={item} value={item}>
-            {item}
-          </MenuItem>
-        ))}
-      </Select>
-    </FieldContainer>
-  )
-}
 
 interface RequestFieldError {
   symbols: string;
@@ -228,13 +88,20 @@ export const CryptoRequestForm = () => {
       >
         {({ values, setFieldValue, handleSubmit }) =>
           <>
-            <SymbolSelect key="symbols" symbols={symbols} setSymbol={setSymbol} />
+            <SymbolSelect
+              key="symbols"
+              label="Symbols"
+              symbols={symbols}
+              setSymbol={setSymbol}
+              symbolList={symbolList}
+            />
             <ErrorMessage name="symbols" component="div" />
             <InputField
               key="multiplier"
               label="Multiplier"
               setFieldValue={(newVal) => setFieldValue('multiplier', newVal)}
               value={values.multiplier}
+              type="number"
             />
             <ErrorMessage name="multiplier" component="div" />
             <InputField
@@ -242,6 +109,7 @@ export const CryptoRequestForm = () => {
               label="Client ID"
               setFieldValue={(newVal) => setFieldValue('clientId', newVal)}
               value={values.clientId}
+              type="text"
             />
             <ErrorMessage name="clientId" component="div" />
             <InputField
@@ -249,6 +117,7 @@ export const CryptoRequestForm = () => {
               label="Fee Limit (uband)"
               setFieldValue={(newVal) => setFieldValue('feeLimit', newVal)}
               value={values.feeLimit}
+              type="number"
             />
             <ErrorMessage name="feeLimit" component="div" />
             <InputField
@@ -256,6 +125,7 @@ export const CryptoRequestForm = () => {
               label="Prepare Gas"
               setFieldValue={(newVal) => setFieldValue('prepareGas', newVal)}
               value={values.prepareGas}
+              type="number"
             />
             <ErrorMessage name="prepareGas" component="div" />
             <InputField
@@ -263,38 +133,32 @@ export const CryptoRequestForm = () => {
               label="Execute Gas"
               setFieldValue={(newVal) => setFieldValue('executeGas', newVal)}
               value={values.executeGas}
+              type="number"
             />
             <ErrorMessage name="executeGas" component="div" />
             <CountDiv>
               <CountSelect
                 label="Ask Count"
-                count={values.askCount}
-                setFieldValue={(newVal) => setFieldValue('askCount', newVal)}
+                askCount={values.askCount}
+                minCount={values.minCount}
+                setFieldValue={(newVal) => {
+                  setFieldValue('askCount', newVal)
+                  if (newVal < values.minCount) { setFieldValue('minCount', 1) }
+                }}
               />
               <ErrorMessage name="askCount" component="div" />
               <CountSelect
                 label="Min Count"
-                count={values.minCount}
+                askCount={values.askCount}
+                minCount={values.minCount}
                 setFieldValue={(newVal) => setFieldValue('minCount', newVal)}
               />
               <ErrorMessage name="minCount" component="div" />
             </CountDiv>
-            <RowDiv>
-              <SubmitButton
-                variant="contained"
-                color="secondary"
-                disabled={loading}
-                onClick={() => handleSubmit()}
-              >
-                Send Request
-              </SubmitButton>
-              {loading && (
-                <>
-                  <CircularProgress color="secondary" size={28} thickness={4.2} />
-                  <Typography variant="body2" sx={{ marginLeft: 0.8 }}>Processing...</Typography>
-                </>
-              )}
-            </RowDiv>
+            <SubmitSection
+              handleSubmit={handleSubmit}
+              loading={loading}
+            />
           </>
         }
       </Formik>
