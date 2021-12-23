@@ -1,8 +1,8 @@
 import * as React from 'react';
 import styled from '@emotion/styled'
 import { Tab, Tabs } from '@mui/material';
-import { CryptoRequestForm, SendCoinForm } from './components'
-import { GetPairForm } from './components/GetPairForm';
+import { CryptoRequestForm, DelegateForm, SendCoinForm } from './components'
+import { GetPairForm } from './components/form/GetPairForm';
 
 const Container = styled.div`
   width: 1080px;
@@ -22,7 +22,7 @@ interface TabContentProps {
   tab: string
 }
 
-type tabsName = 'crypto' | 'sendcoin' | 'getpair'
+type tabsName = 'crypto' | 'sendcoin' | 'getpair' | 'delegate'
 
 const TabContent = (props: TabContentProps) => {
   const { children, value, tab } = props;
@@ -51,7 +51,8 @@ const Home = () => {
       >
         <Tab value="crypto" label="Request Crypto Price" />
         <Tab value="sendcoin" label="Send Band Token" sx={{ borderLeft: '1px solid lightgrey', borderRight: '1px solid lightgrey' }} />
-        <Tab value="getpair" label="Get Reference Data" />
+        <Tab value="getpair" label="Get Reference Data" sx={{ borderRight: '1px solid lightgrey' }} />
+        <Tab value="delegate" label="Delegate" />
       </Tabs>
       <TabContent value={value} tab='crypto'>
         <CryptoRequestForm />
@@ -61,6 +62,9 @@ const Home = () => {
       </TabContent>
       <TabContent value={value} tab='getpair'>
         <GetPairForm />
+      </TabContent>
+      <TabContent value={value} tab='delegate'>
+        <DelegateForm />
       </TabContent>
     </Container>
   )

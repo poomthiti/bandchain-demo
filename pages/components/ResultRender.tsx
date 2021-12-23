@@ -31,19 +31,24 @@ export type ResultObject = {
   height: number
   gasUsed: number
   txhash: string
-  data: string
   schema?: string
 }
 
-export const ResultRender: React.FC<ResultObject> = ({ height, gasUsed, txhash, data, schema = "" }) => {
-  let decodedData;
-  if (schema) {
-    // const obi = new Obi(schema)
-    // const result = "\\x000000010000000000000fd2"
-    // const buffer = Buffer.from(result)
-    // console.log(buffer)
-    // decodedData = obi.decodeOutput(buffer)
-    // console.log(decodedData)
+interface RenderProps {
+  result: ResultObject
+  queryLoading?: boolean
+  queryData?: string | undefined
+}
+
+export const ResultRender: React.FC<RenderProps> = ({ result, queryData }) => {
+  const { schema, height, gasUsed, txhash } = result
+  let resultString;
+  if (schema && queryData) {
+    const obi = new Obi(schema)
+    const subStr = queryData?.substring(2)
+    const buffer = Buffer.from(subStr, 'hex')
+    const decodedData = obi.decodeOutput(buffer)
+    resultString = JSON.stringify(decodedData, (_, value) => typeof value === 'bigint' ? value.toString() : value, 2)
   }
   return (
     <Container>
@@ -73,10 +78,10 @@ export const ResultRender: React.FC<ResultObject> = ({ height, gasUsed, txhash, 
       </RowDiv>
       <RowDiv>
         <KeyText>
-          Result
+          Request Result
         </KeyText>
         <ValueText>
-          {data}
+          {resultString}
         </ValueText>
       </RowDiv>
     </Container>

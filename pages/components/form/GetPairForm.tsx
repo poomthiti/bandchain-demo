@@ -1,14 +1,14 @@
 import React from 'react'
 import styled from '@emotion/styled'
-import { CountSelect, SubmitSection, SymbolSelect } from '.'
+import { CountSelect, SubmitSection, SymbolSelect } from '..'
 import { ErrorMessage, Formik } from 'formik'
-import { getPairRef } from '../utils/BandChain'
+import { getPairRef } from '../../utils/BandChain'
 
 const CountDiv = styled.div`
   display: flex;
   flex-direction: row;
 `
-const ResultDiv = styled.pre`
+const ResultPre = styled.pre`
   margin-top: 16px;
 `
 
@@ -85,9 +85,9 @@ export const GetPairForm = () => {
           </>
         )}
       </Formik>
-      <ResultDiv>
+      <ResultPre>
         {txResult}
-      </ResultDiv>
+      </ResultPre>
     </>
   )
 }

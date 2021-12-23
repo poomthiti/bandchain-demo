@@ -1,7 +1,7 @@
 import React from 'react'
 import { ErrorMessage, Formik } from 'formik'
-import { sendCoin } from '../utils/BandChain'
-import { ResultRender, ResultObject, InputField, SubmitSection } from '.'
+import { sendCoin } from '../../utils/BandChain'
+import { ResultRender, ResultObject, InputField, SubmitSection } from '..'
 
 interface RequestFieldError {
   amount: string;

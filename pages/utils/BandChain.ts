@@ -75,7 +75,6 @@ export const requestCryptoPrice = async ({
   const txRawBytes = txn.getTxData(signature, pubKey)
 
   const sendTx = await client.sendTxBlockMode(txRawBytes)
-  setLoading(false)
   return sendTx
 }
 
@@ -83,6 +82,7 @@ interface SendCoinProps {
   amount: string
   receiver: string
 }
+
 export const sendCoin = async ({
   amount,
   receiver
@@ -126,12 +126,56 @@ interface GetPairProps {
   minCount: number
   pairs: string[]
 }
+
 export const getPairRef = async (
   { askCount, minCount, pairs }: GetPairProps,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>) => {
   setLoading(true)
   const response = await client.getReferenceData(pairs, minCount, askCount)
   setLoading(false)
-  console.log(response)
+  return JSON.stringify(response, null, 2)
+}
+
+interface DelegateProps {
+  validator: string
+  amount: string
+  memo: string
+}
+
+export const delegateCoin = async (
+  { validator, amount, memo }: DelegateProps,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+  setLoading(true)
+  const delegateAmount = new Coin()
+  delegateAmount.setDenom("uband")
+  delegateAmount.setAmount(amount + '1000')
+
+  let feeCoin = new Coin()
+  feeCoin.setDenom("uband")
+  feeCoin.setAmount("5000")
+
+  const fee = new Fee()
+  fee.setAmountList([feeCoin])
+  fee.setGasLimit(1000000)
+
+  const msg = new Message.MsgDelegate(sender, validator, delegateAmount)
+  const account = await client.getAccount(sender)
+  const chainId = await client.getChainId()
+
+  const tx = new Transaction()
+    .withMessages(msg)
+    .withFee(fee)
+    .withMemo(memo)
+    .withChainId(chainId)
+    .withAccountNum(account.accountNumber)
+    .withSequence(account.sequence)
+
+  const txSignData = tx.getSignDoc(pubKey)
+  const signature = privKey.sign(txSignData)
+  const signedTx = tx.getTxData(signature, pubKey)
+
+  const response = await client.sendTxBlockMode(signedTx)
+  setLoading(false)
   return JSON.stringify(response, null, 2)
 }

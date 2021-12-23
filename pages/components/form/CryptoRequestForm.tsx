@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import styled from '@emotion/styled'
 import { Formik, ErrorMessage } from 'formik'
-import { requestCryptoPrice } from '../utils/BandChain'
+import { GET_REQUEST_BY_HASH } from '../../graphql'
+import { requestCryptoPrice } from '../../utils/BandChain'
 import {
   ResultRender,
   ResultObject,
@@ -9,7 +10,8 @@ import {
   SubmitSection,
   CountSelect,
   SymbolSelect
-} from '.'
+} from '..'
+import { useQuery } from '@apollo/client'
 
 const CountDiv = styled.div`
   display: flex;
@@ -32,7 +34,24 @@ export const CryptoRequestForm = () => {
   const [symbols, setSymbol] = useState<string[] | string>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [txResult, setTxResult] = useState<ResultObject | null>(null)
+  const [queryData, setQueryData] = useState<string | undefined>(undefined)
   const schema = "{symbols:[string],multiplier:u64}/{rates:[u64]}"
+  const { stopPolling } = useQuery(GET_REQUEST_BY_HASH, {
+    fetchPolicy: 'network-only',
+    variables: { tx_hash: "\\x" + txResult?.txhash },
+    pollInterval: 200,
+    skip: !txResult,
+    onCompleted: (data) => {
+      setQueryData(data?.requests[0]?.result);
+    }
+  })
+
+  React.useEffect(() => {
+    if (queryData) {
+      stopPolling()
+      setLoading(false)
+    }
+  }, [queryData, stopPolling])
 
   return (
     <>
@@ -81,7 +100,6 @@ export const CryptoRequestForm = () => {
             height: res?.height,
             gasUsed: res?.gasUsed,
             txhash: res?.txhash,
-            data: res?.data,
             schema: schema
           })
         }}
@@ -162,13 +180,10 @@ export const CryptoRequestForm = () => {
           </>
         }
       </Formik>
-      {txResult && (
+      {(txResult && queryData) && (
         <ResultRender
-          height={txResult?.height}
-          gasUsed={txResult?.gasUsed}
-          txhash={txResult?.txhash}
-          data={txResult?.data}
-          schema={txResult?.schema}
+          result={txResult}
+          queryData={queryData}
         />
       )}
     </>
