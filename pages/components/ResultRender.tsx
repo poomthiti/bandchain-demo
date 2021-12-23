@@ -31,17 +31,17 @@ export type ResultObject = {
   height: number
   gasUsed: number
   txhash: string
-  schema?: string
 }
 
 interface RenderProps {
   result: ResultObject
   queryLoading?: boolean
   queryData?: string | undefined
+  schema?: string
 }
 
-export const ResultRender: React.FC<RenderProps> = ({ result, queryData }) => {
-  const { schema, height, gasUsed, txhash } = result
+export const ResultRender: React.FC<RenderProps> = ({ result, queryData, schema }) => {
+  const { height, gasUsed, txhash } = result
   let resultString;
   if (schema && queryData) {
     const obi = new Obi(schema)
@@ -76,14 +76,16 @@ export const ResultRender: React.FC<RenderProps> = ({ result, queryData }) => {
           {txhash}
         </ValueText>
       </RowDiv>
-      <RowDiv>
-        <KeyText>
-          Request Result
-        </KeyText>
-        <ValueText>
-          {resultString}
-        </ValueText>
-      </RowDiv>
+      {schema && (
+        <RowDiv>
+          <KeyText>
+            Request Result
+          </KeyText>
+          <ValueText>
+            {resultString}
+          </ValueText>
+        </RowDiv>
+      )}
     </Container>
   )
 }

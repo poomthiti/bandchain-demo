@@ -5,7 +5,7 @@ import { CryptoRequestForm, DelegateForm, SendCoinForm } from './components'
 import { GetPairForm } from './components/form/GetPairForm';
 
 const Container = styled.div`
-  width: 1080px;
+  width: 100%;
   min-height: 100vh;
   border-radius: 2px;
   background-color: white;

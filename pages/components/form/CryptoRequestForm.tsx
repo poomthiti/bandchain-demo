@@ -100,7 +100,6 @@ export const CryptoRequestForm = () => {
             height: res?.height,
             gasUsed: res?.gasUsed,
             txhash: res?.txhash,
-            schema: schema
           })
         }}
       >
@@ -184,6 +183,7 @@ export const CryptoRequestForm = () => {
         <ResultRender
           result={txResult}
           queryData={queryData}
+          schema={schema}
         />
       )}
     </>

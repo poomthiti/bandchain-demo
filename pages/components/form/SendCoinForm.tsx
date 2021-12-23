@@ -34,7 +34,6 @@ export const SendCoinForm = () => {
             height: res?.height,
             gasUsed: res?.gasUsed,
             txhash: res?.txhash,
-            data: res?.data,
           })
         }}
       >
@@ -65,10 +64,7 @@ export const SendCoinForm = () => {
       </Formik>
       {txResult && (
         <ResultRender
-          height={txResult?.height}
-          gasUsed={txResult?.gasUsed}
-          txhash={txResult?.txhash}
-          data={txResult?.data}
+          result={txResult}
         />
       )}
     </>
