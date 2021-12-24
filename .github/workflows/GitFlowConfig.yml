@@ -12,7 +12,7 @@ on:
 jobs:
   build:
 
-    runs-on: ${{maxtrix.os}}
+    runs-on: ${{matrix.os}}
 
     strategy:
       matrix:
