@@ -1,8 +1,8 @@
 import * as React from 'react';
 import styled from '@emotion/styled'
 import { Tab, Tabs } from '@mui/material';
-import { CryptoRequestForm, DelegateForm, SendCoinForm } from './components'
-import { GetPairForm } from './components/form/GetPairForm';
+import { CryptoRequestForm, DelegateForm, SendCoinForm } from '../components'
+import { GetPairForm } from '../components/form/GetPairForm';
 
 const Container = styled.div`
   width: 100%;
