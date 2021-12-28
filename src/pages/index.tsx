@@ -49,10 +49,15 @@ const Home = () => {
         variant="fullWidth"
         sx={{ borderBottom: '1px solid lightgrey' }}
       >
-        <Tab value="crypto" label="Request Crypto Price" />
-        <Tab value="sendcoin" label="Send Band Token" sx={{ borderLeft: '1px solid lightgrey', borderRight: '1px solid lightgrey' }} />
-        <Tab value="getpair" label="Get Reference Data" sx={{ borderRight: '1px solid lightgrey' }} />
-        <Tab value="delegate" label="Delegate" />
+        <Tab value="crypto" label="Request Crypto Price" id='crypto' />
+        <Tab
+          value="sendcoin"
+          label="Send Band Token"
+          sx={{ borderLeft: '1px solid lightgrey', borderRight: '1px solid lightgrey' }}
+          id='sendcoin'
+        />
+        <Tab value="getpair" label="Get Reference Data" sx={{ borderRight: '1px solid lightgrey' }} id='getpair' />
+        <Tab value="delegate" label="Delegate" id='delegate' />
       </Tabs>
       <TabContent value={value} tab='crypto'>
         <CryptoRequestForm />
