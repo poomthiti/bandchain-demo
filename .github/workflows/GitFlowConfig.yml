@@ -30,4 +30,5 @@ jobs:
 #     - run: rm -r node_modules
     - run: yarn install --frozen-lockfile
     - run: yarn build
-    - run: yarn test:ci
+    # - run: yarn test:ci
+    - run: yarn integration-test

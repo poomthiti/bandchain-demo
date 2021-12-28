@@ -43,6 +43,7 @@ export const DelegateForm = () => {
         {({ values, handleSubmit, setFieldValue }) =>
           <>
             <InputField
+              testId="delegate-amount"
               key="amount"
               label="Amount (BAND)"
               setFieldValue={(newVal) => setFieldValue('amount', newVal)}
@@ -73,7 +74,7 @@ export const DelegateForm = () => {
           </>
         }
       </Formik>
-      <ResultPre>
+      <ResultPre id="delegate-result">
         {txResult}
       </ResultPre>
     </>

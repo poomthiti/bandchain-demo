@@ -16,13 +16,15 @@ interface FieldProps {
   value: number | string
   setFieldValue: (val: number | string) => void
   type: "text" | "number"
+  testId?: string
 }
 
-export const InputField: React.FC<FieldProps> = ({ label, value, setFieldValue, type }) => {
+export const InputField: React.FC<FieldProps> = ({ label, value, setFieldValue, type, testId }) => {
   return (
     <FieldContainer>
       <InputLabel>{label}</InputLabel>
       <TextField
+        id={testId}
         sx={{ width: '60%' }}
         fullWidth
         value={value}

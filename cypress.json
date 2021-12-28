@@ -1,0 +1,6 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "videoUploadOnPasses": false,
+  "pluginsFile": false,
+  "fixturesFolder": false
+}

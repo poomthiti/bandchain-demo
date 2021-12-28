@@ -51,7 +51,7 @@ export const ResultRender: React.FC<RenderProps> = ({ result, queryData, schema 
     resultString = JSON.stringify(decodedData, (_, value) => typeof value === 'bigint' ? value.toString() : value, 2)
   }
   return (
-    <Container>
+    <Container id="result-container">
       <RowDiv>
         <KeyText>
           Block Height
@@ -81,7 +81,7 @@ export const ResultRender: React.FC<RenderProps> = ({ result, queryData, schema 
           <KeyText>
             Request Result
           </KeyText>
-          <ValueText>
+          <ValueText id="symbols-result">
             {resultString}
           </ValueText>
         </RowDiv>
