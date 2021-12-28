@@ -26,6 +26,7 @@ export const SymbolSelect: React.FC<SymbolSelectProps> = ({ setSymbol, symbols, 
         {label}
       </InputLabel>
       <Select
+        id="symbols-select"
         sx={{ width: '60%' }}
         multiple
         fullWidth
@@ -52,7 +53,7 @@ export const SymbolSelect: React.FC<SymbolSelectProps> = ({ setSymbol, symbols, 
         }}
       >
         {symbolList.map(item => (
-          <MenuItem key={item} value={item}>
+          <MenuItem key={item} value={item} id={`list-item-${item}`}>
             <Checkbox checked={symbols.indexOf(item) > -1} color="secondary" />
             <ListItemText primary={item} />
           </MenuItem>

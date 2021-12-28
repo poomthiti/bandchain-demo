@@ -85,7 +85,7 @@ export const GetPairForm = () => {
           </>
         )}
       </Formik>
-      <ResultPre>
+      <ResultPre id="getpair-result">
         {txResult}
       </ResultPre>
     </>

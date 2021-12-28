@@ -28,14 +28,15 @@ export const SubmitSection = ({ handleSubmit, loading }: SubmitProps) => {
         color="secondary"
         disabled={loading}
         onClick={() => handleSubmit()}
+        id="submit-btn"
       >
         Send Request
       </SubmitButton>
       {loading && (
-        <>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} id="loading-section">
           <CircularProgress color="secondary" size={28} thickness={4.2} />
           <Typography variant="body2" sx={{ marginLeft: 0.8 }}>Processing...</Typography>
-        </>
+        </div>
       )}
     </RowDiv>
   )

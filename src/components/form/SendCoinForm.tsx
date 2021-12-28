@@ -40,6 +40,7 @@ export const SendCoinForm = () => {
         {({ values, handleSubmit, setFieldValue }) => (
           <>
             <InputField
+              testId="send-amount"
               key="amount"
               label="Amount (uband)"
               value={values.amount}
