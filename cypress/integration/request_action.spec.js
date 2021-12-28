@@ -21,14 +21,14 @@ describe("BandChain Action", () => {
     cy.get('[id="result-container"]', { timeout: 10000 }).should('be.visible')
   })
 
-  it("Get Reference Data Successfully", () => {
-    cy.get('[id="getpair"]').click()
-    cy.get('[id="symbols-select"]').click()
-    cy.get('[id="list-item-BTC/USD"]').click().clickOutside()
-    cy.get('[id="submit-btn"]').click().should('be.disabled')
-    cy.get('[id="loading-section"]').should('be.visible')
-    cy.get('[id="getpair-result"]', { timeout: 10000 }).should('contain', 'pair')
-  })
+  // it("Get Reference Data Successfully", () => {
+  //   cy.get('[id="getpair"]').click()
+  //   cy.get('[id="symbols-select"]').click()
+  //   cy.get('[id="list-item-BTC/USD"]').click().clickOutside()
+  //   cy.get('[id="submit-btn"]').click().should('be.disabled')
+  //   cy.get('[id="loading-section"]').should('be.visible')
+  //   cy.get('[id="getpair-result"]', { timeout: 10000 }).should('contain', 'pair')
+  // })
 
   it("Delegate successfully", () => {
     cy.get('[id="delegate"]').click()
