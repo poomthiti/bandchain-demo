@@ -1,23 +1,33 @@
-import React, { useState } from 'react'
-import styled from '@emotion/styled'
-import { Formik, ErrorMessage } from 'formik'
-import { GET_REQUEST_BY_HASH } from '../../graphql'
-import { requestCryptoPrice } from '../../utils/BandChain'
+import React, { useState } from "react";
+import styled from "@emotion/styled";
+import { Formik, ErrorMessage } from "formik";
+import { requestCryptoPrice } from "../../utils/BandChain";
 import {
   ResultRender,
   ResultObject,
   InputField,
   SubmitSection,
   CountSelect,
-  SymbolSelect
-} from '..'
-import { useQuery } from '@apollo/client'
+  SymbolSelect,
+} from "..";
 
 const CountDiv = styled.div`
   display: flex;
   flex-direction: row;
-`
-const symbolList = ['BTC', 'ETH', 'BNB', 'SOL', 'ADA', 'XRP', 'DOT', 'DOGE', 'SHIB', 'MATIC', 'LTC']
+`;
+const symbolList = [
+  "BTC",
+  "ETH",
+  "BNB",
+  "SOL",
+  "ADA",
+  "XRP",
+  "DOT",
+  "DOGE",
+  "SHIB",
+  "MATIC",
+  "LTC",
+];
 
 interface RequestFieldError {
   symbols: string;
@@ -31,79 +41,65 @@ interface RequestFieldError {
 }
 
 export const CryptoRequestForm = () => {
-  const [symbols, setSymbol] = useState<string[] | string>([])
-  const [loading, setLoading] = useState<boolean>(false)
-  const [txResult, setTxResult] = useState<ResultObject | null>(null)
-  const [queryData, setQueryData] = useState<string | undefined>(undefined)
-  const schema = "{symbols:[string],multiplier:u64}/{rates:[u64]}"
-  const { stopPolling } = useQuery(GET_REQUEST_BY_HASH, {
-    fetchPolicy: 'network-only',
-    variables: { tx_hash: "\\x" + txResult?.txhash },
-    pollInterval: 200,
-    skip: !txResult,
-    onCompleted: (data) => {
-      setQueryData(data?.requests[0]?.result);
-    }
-  })
-
-  React.useEffect(() => {
-    if (queryData) {
-      stopPolling()
-      setLoading(false)
-    }
-  }, [queryData, stopPolling])
+  const [symbols, setSymbol] = useState<string[] | string>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [txResult, setTxResult] = useState<ResultObject | null>(null);
 
   return (
     <>
       <Formik
         initialValues={{
-          symbols: '',
+          symbols: "",
           multiplier: 1,
           askCount: 1,
           minCount: 1,
-          clientId: 'from_scan',
+          clientId: "from_scan",
           feeLimit: 100,
           prepareGas: 30000,
-          executeGas: 50000
+          executeGas: 50000,
         }}
-        validate={values => {
+        validate={(values) => {
           const errors: Partial<RequestFieldError> = {};
           if (symbols.length < 1) {
-            errors.symbols = 'Required';
+            errors.symbols = "Required";
           }
           if (!values.multiplier) {
-            errors.multiplier = 'Required';
+            errors.multiplier = "Required";
           }
           if (!values.askCount) {
-            errors.askCount = 'Required';
+            errors.askCount = "Required";
           }
           if (!values.minCount) {
-            errors.minCount = 'Required';
+            errors.minCount = "Required";
           }
           if (!values.clientId) {
-            errors.clientId = 'Required';
+            errors.clientId = "Required";
           }
           if (!values.feeLimit) {
-            errors.feeLimit = 'Required';
+            errors.feeLimit = "Required";
           }
           if (!values.prepareGas) {
-            errors.prepareGas = 'Required';
+            errors.prepareGas = "Required";
           }
           if (!values.executeGas) {
-            errors.executeGas = 'Required';
+            errors.executeGas = "Required";
           }
           return errors;
         }}
         onSubmit={async (values) => {
-          const res = await requestCryptoPrice({ ...values, symbols: symbols }, setLoading)
+          const res = await requestCryptoPrice(
+            { ...values, symbols: symbols },
+            setLoading
+          );
           setTxResult({
             height: res?.height,
             gasUsed: res?.gasUsed,
             txhash: res?.txhash,
-          })
+            data: res?.data,
+          });
         }}
       >
-        {({ values, setFieldValue, handleSubmit }) =>
+        {({ values, setFieldValue, handleSubmit }) => (
           <>
             <SymbolSelect
               key="symbols"
@@ -116,7 +112,7 @@ export const CryptoRequestForm = () => {
             <InputField
               key="multiplier"
               label="Multiplier"
-              setFieldValue={(newVal) => setFieldValue('multiplier', newVal)}
+              setFieldValue={(newVal) => setFieldValue("multiplier", newVal)}
               value={values.multiplier}
               type="number"
             />
@@ -124,7 +120,7 @@ export const CryptoRequestForm = () => {
             <InputField
               key="clientId"
               label="Client ID"
-              setFieldValue={(newVal) => setFieldValue('clientId', newVal)}
+              setFieldValue={(newVal) => setFieldValue("clientId", newVal)}
               value={values.clientId}
               type="text"
             />
@@ -132,7 +128,7 @@ export const CryptoRequestForm = () => {
             <InputField
               key="feeLimit"
               label="Fee Limit (uband)"
-              setFieldValue={(newVal) => setFieldValue('feeLimit', newVal)}
+              setFieldValue={(newVal) => setFieldValue("feeLimit", newVal)}
               value={values.feeLimit}
               type="number"
             />
@@ -140,7 +136,7 @@ export const CryptoRequestForm = () => {
             <InputField
               key="prepareGas"
               label="Prepare Gas"
-              setFieldValue={(newVal) => setFieldValue('prepareGas', newVal)}
+              setFieldValue={(newVal) => setFieldValue("prepareGas", newVal)}
               value={values.prepareGas}
               type="number"
             />
@@ -148,7 +144,7 @@ export const CryptoRequestForm = () => {
             <InputField
               key="executeGas"
               label="Execute Gas"
-              setFieldValue={(newVal) => setFieldValue('executeGas', newVal)}
+              setFieldValue={(newVal) => setFieldValue("executeGas", newVal)}
               value={values.executeGas}
               type="number"
             />
@@ -159,8 +155,10 @@ export const CryptoRequestForm = () => {
                 askCount={values.askCount}
                 minCount={values.minCount}
                 setFieldValue={(newVal) => {
-                  setFieldValue('askCount', newVal)
-                  if (newVal < values.minCount) { setFieldValue('minCount', 1) }
+                  setFieldValue("askCount", newVal);
+                  if (newVal < values.minCount) {
+                    setFieldValue("minCount", 1);
+                  }
                 }}
               />
               <ErrorMessage name="askCount" component="div" />
@@ -168,24 +166,15 @@ export const CryptoRequestForm = () => {
                 label="Min Count"
                 askCount={values.askCount}
                 minCount={values.minCount}
-                setFieldValue={(newVal) => setFieldValue('minCount', newVal)}
+                setFieldValue={(newVal) => setFieldValue("minCount", newVal)}
               />
               <ErrorMessage name="minCount" component="div" />
             </CountDiv>
-            <SubmitSection
-              handleSubmit={handleSubmit}
-              loading={loading}
-            />
+            <SubmitSection handleSubmit={handleSubmit} loading={loading} />
           </>
-        }
+        )}
       </Formik>
-      {(txResult && queryData) && (
-        <ResultRender
-          result={txResult}
-          queryData={queryData}
-          schema={schema}
-        />
-      )}
+      {txResult && <ResultRender result={txResult} />}
     </>
-  )
-}
+  );
+};
