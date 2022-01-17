@@ -182,7 +182,7 @@ export const delegateCoin = async (
   setLoading(true);
   const delegateAmount = new Coin();
   delegateAmount.setDenom("uband");
-  delegateAmount.setAmount(String((Number(amount) * 10) ^ 6));
+  delegateAmount.setAmount(String(Number(amount) * (10 ^ 6)));
 
   let feeCoin = new Coin();
   feeCoin.setDenom("uband");
