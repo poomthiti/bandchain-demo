@@ -2,34 +2,38 @@ import React from 'react'
 import { ErrorMessage, Formik } from 'formik'
 import { sendCoin } from '../../utils/BandChain'
 import { ResultRender, ResultObject, InputField, SubmitSection } from '..'
+import { useRecoilValue } from 'recoil'
+import { ledgerState } from 'atom/atom'
 
 interface RequestFieldError {
-  amount: string;
-  receiver: string;
+  amount: string
+  receiver: string
 }
 
 export const SendCoinForm = () => {
   const [loading, setLoading] = React.useState<boolean>(false)
   const [txResult, setTxResult] = React.useState<ResultObject | null>(null)
+  const wallet = useRecoilValue(ledgerState)
+
   return (
     <>
       <Formik
         initialValues={{
-          amount: "",
-          receiver: "band19zpx49n8gyaqrscaklrzynm8sgavfkcmjlap9r"
+          amount: '',
+          receiver: 'band19zpx49n8gyaqrscaklrzynm8sgavfkcmjlap9r',
         }}
-        validate={values => {
-          const errors: Partial<RequestFieldError> = {};
+        validate={(values) => {
+          const errors: Partial<RequestFieldError> = {}
           if (!values.amount) {
-            errors.amount = 'Required';
+            errors.amount = 'Required'
           }
           if (!values.receiver) {
-            errors.receiver = 'Required';
+            errors.receiver = 'Required'
           }
-          return errors;
+          return errors
         }}
         onSubmit={async (values) => {
-          const res = await sendCoin(values, setLoading)
+          const res = await sendCoin(values, setLoading, wallet)
           setTxResult({
             height: res?.height,
             gasUsed: res?.gasUsed,
@@ -56,18 +60,11 @@ export const SendCoinForm = () => {
               type="text"
             />
             <ErrorMessage name="receiver" component="div" />
-            <SubmitSection
-              handleSubmit={handleSubmit}
-              loading={loading}
-            />
+            <SubmitSection handleSubmit={handleSubmit} loading={loading} />
           </>
         )}
       </Formik>
-      {txResult && (
-        <ResultRender
-          result={txResult}
-        />
-      )}
+      {txResult && <ResultRender result={txResult} />}
     </>
   )
 }

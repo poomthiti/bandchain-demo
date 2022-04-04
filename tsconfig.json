@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "src/",
     "target": "es5",
     "lib": [
       "dom",
@@ -24,7 +25,7 @@
     "**/*.ts",
     "**/*.tsx",
     "cypress/support/commands.js"
-  ],
+, "src/utils/BandChain.js"  ],
   "exclude": [
     "node_modules"
   ]

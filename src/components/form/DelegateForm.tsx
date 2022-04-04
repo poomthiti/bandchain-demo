@@ -1,6 +1,8 @@
 import styled from '@emotion/styled'
+import { ledgerState } from 'atom/atom'
 import { ErrorMessage, Formik } from 'formik'
 import React from 'react'
+import { useRecoilValue } from 'recoil'
 import { InputField, SubmitSection } from '..'
 import { delegateCoin } from '../../utils/BandChain'
 
@@ -17,30 +19,32 @@ interface RequestFieldError {
 export const DelegateForm = () => {
   const [loading, setLoading] = React.useState<boolean>(false)
   const [txResult, setTxResult] = React.useState<string | null>(null)
+  const wallet = useRecoilValue(ledgerState)
+
   return (
     <>
       <Formik
         initialValues={{
-          amount: "",
-          validator: "bandvaloper1nlepx7xg53fsy6vslrss6adtmtl8a33kusv7fa",
-          memo: ""
+          amount: '',
+          validator: 'bandvaloper1nlepx7xg53fsy6vslrss6adtmtl8a33kusv7fa',
+          memo: '',
         }}
-        validate={values => {
-          const errors: Partial<RequestFieldError> = {};
+        validate={(values) => {
+          const errors: Partial<RequestFieldError> = {}
           if (!values.amount) {
-            errors.amount = 'Required';
+            errors.amount = 'Required'
           }
           if (!values.validator) {
-            errors.validator = 'Required';
+            errors.validator = 'Required'
           }
-          return errors;
+          return errors
         }}
         onSubmit={async (values) => {
-          const res = await delegateCoin(values, setLoading)
+          const res = await delegateCoin(values, setLoading, wallet)
           setTxResult(res)
         }}
       >
-        {({ values, handleSubmit, setFieldValue }) =>
+        {({ values, handleSubmit, setFieldValue }) => (
           <>
             <InputField
               testId="delegate-amount"
@@ -67,16 +71,11 @@ export const DelegateForm = () => {
               type="text"
             />
             <ErrorMessage name="memo" component="div" />
-            <SubmitSection
-              loading={loading}
-              handleSubmit={handleSubmit}
-            />
+            <SubmitSection loading={loading} handleSubmit={handleSubmit} />
           </>
-        }
+        )}
       </Formik>
-      <ResultPre id="delegate-result">
-        {txResult}
-      </ResultPre>
+      <ResultPre id="delegate-result">{txResult}</ResultPre>
     </>
   )
 }

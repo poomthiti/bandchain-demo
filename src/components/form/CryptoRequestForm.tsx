@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import styled from "@emotion/styled";
-import { Formik, ErrorMessage } from "formik";
-import { requestCryptoPrice } from "../../utils/BandChain";
+import React, { useState } from 'react'
+import styled from '@emotion/styled'
+import { Formik, ErrorMessage } from 'formik'
+import { requestCryptoPrice } from '../../utils/BandChain'
 import {
   ResultRender,
   ResultObject,
@@ -9,94 +9,98 @@ import {
   SubmitSection,
   CountSelect,
   SymbolSelect,
-} from "..";
+} from '..'
+import { useRecoilValue } from 'recoil'
+import { ledgerState } from 'atom/atom'
 
 const CountDiv = styled.div`
   display: flex;
   flex-direction: row;
-`;
+`
 const symbolList = [
-  "BTC",
-  "ETH",
-  "BNB",
-  "SOL",
-  "ADA",
-  "XRP",
-  "DOT",
-  "DOGE",
-  "SHIB",
-  "MATIC",
-  "LTC",
-];
+  'BTC',
+  'ETH',
+  'BNB',
+  'SOL',
+  'ADA',
+  'XRP',
+  'DOT',
+  'DOGE',
+  'SHIB',
+  'MATIC',
+  'LTC',
+]
 
 interface RequestFieldError {
-  symbols: string;
-  multiplier: string;
-  askCount: string;
-  minCount: string;
-  clientId: string;
-  feeLimit: string;
-  prepareGas: string;
-  executeGas: string;
+  symbols: string
+  multiplier: string
+  askCount: string
+  minCount: string
+  clientId: string
+  feeLimit: string
+  prepareGas: string
+  executeGas: string
 }
 
 export const CryptoRequestForm = () => {
-  const [symbols, setSymbol] = useState<string[] | string>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [txResult, setTxResult] = useState<ResultObject | null>(null);
+  const [symbols, setSymbol] = useState<string[] | string>([])
+  const [loading, setLoading] = useState<boolean>(false)
+  const [txResult, setTxResult] = useState<ResultObject | null>(null)
+  const wallet = useRecoilValue(ledgerState)
 
   return (
     <>
       <Formik
         initialValues={{
-          symbols: "",
+          symbols: '',
           multiplier: 1,
           askCount: 1,
           minCount: 1,
-          clientId: "from_scan",
+          clientId: 'from_scan',
           feeLimit: 100,
           prepareGas: 30000,
           executeGas: 50000,
         }}
         validate={(values) => {
-          const errors: Partial<RequestFieldError> = {};
+          const errors: Partial<RequestFieldError> = {}
           if (symbols.length < 1) {
-            errors.symbols = "Required";
+            errors.symbols = 'Required'
           }
           if (!values.multiplier) {
-            errors.multiplier = "Required";
+            errors.multiplier = 'Required'
           }
           if (!values.askCount) {
-            errors.askCount = "Required";
+            errors.askCount = 'Required'
           }
           if (!values.minCount) {
-            errors.minCount = "Required";
+            errors.minCount = 'Required'
           }
           if (!values.clientId) {
-            errors.clientId = "Required";
+            errors.clientId = 'Required'
           }
           if (!values.feeLimit) {
-            errors.feeLimit = "Required";
+            errors.feeLimit = 'Required'
           }
           if (!values.prepareGas) {
-            errors.prepareGas = "Required";
+            errors.prepareGas = 'Required'
           }
           if (!values.executeGas) {
-            errors.executeGas = "Required";
+            errors.executeGas = 'Required'
           }
-          return errors;
+          return errors
         }}
         onSubmit={async (values) => {
           const res = await requestCryptoPrice(
             { ...values, symbols: symbols },
-            setLoading
-          );
+            setLoading,
+            wallet
+          )
           setTxResult({
             height: res?.height,
             gasUsed: res?.gasUsed,
             txhash: res?.txhash,
             data: res?.data,
-          });
+          })
         }}
       >
         {({ values, setFieldValue, handleSubmit }) => (
@@ -112,7 +116,7 @@ export const CryptoRequestForm = () => {
             <InputField
               key="multiplier"
               label="Multiplier"
-              setFieldValue={(newVal) => setFieldValue("multiplier", newVal)}
+              setFieldValue={(newVal) => setFieldValue('multiplier', newVal)}
               value={values.multiplier}
               type="number"
             />
@@ -120,7 +124,7 @@ export const CryptoRequestForm = () => {
             <InputField
               key="clientId"
               label="Client ID"
-              setFieldValue={(newVal) => setFieldValue("clientId", newVal)}
+              setFieldValue={(newVal) => setFieldValue('clientId', newVal)}
               value={values.clientId}
               type="text"
             />
@@ -128,7 +132,7 @@ export const CryptoRequestForm = () => {
             <InputField
               key="feeLimit"
               label="Fee Limit (uband)"
-              setFieldValue={(newVal) => setFieldValue("feeLimit", newVal)}
+              setFieldValue={(newVal) => setFieldValue('feeLimit', newVal)}
               value={values.feeLimit}
               type="number"
             />
@@ -136,7 +140,7 @@ export const CryptoRequestForm = () => {
             <InputField
               key="prepareGas"
               label="Prepare Gas"
-              setFieldValue={(newVal) => setFieldValue("prepareGas", newVal)}
+              setFieldValue={(newVal) => setFieldValue('prepareGas', newVal)}
               value={values.prepareGas}
               type="number"
             />
@@ -144,7 +148,7 @@ export const CryptoRequestForm = () => {
             <InputField
               key="executeGas"
               label="Execute Gas"
-              setFieldValue={(newVal) => setFieldValue("executeGas", newVal)}
+              setFieldValue={(newVal) => setFieldValue('executeGas', newVal)}
               value={values.executeGas}
               type="number"
             />
@@ -155,9 +159,9 @@ export const CryptoRequestForm = () => {
                 askCount={values.askCount}
                 minCount={values.minCount}
                 setFieldValue={(newVal) => {
-                  setFieldValue("askCount", newVal);
+                  setFieldValue('askCount', newVal)
                   if (newVal < values.minCount) {
-                    setFieldValue("minCount", 1);
+                    setFieldValue('minCount', 1)
                   }
                 }}
               />
@@ -166,7 +170,7 @@ export const CryptoRequestForm = () => {
                 label="Min Count"
                 askCount={values.askCount}
                 minCount={values.minCount}
-                setFieldValue={(newVal) => setFieldValue("minCount", newVal)}
+                setFieldValue={(newVal) => setFieldValue('minCount', newVal)}
               />
               <ErrorMessage name="minCount" component="div" />
             </CountDiv>
@@ -176,5 +180,5 @@ export const CryptoRequestForm = () => {
       </Formik>
       {txResult && <ResultRender result={txResult} />}
     </>
-  );
-};
+  )
+}
