@@ -37,12 +37,8 @@ export const LedgerConnect = () => {
             setLedgerState({
               publicKey: '',
               address: '',
-              disconnect: () => new Promise(() => null),
-              sign: (msg: string) =>
-                new Promise<{
-                  signature: Buffer | null
-                  return_code: string | number
-                }>(() => ({ signature: null, return_code: '' })),
+              disconnect: () => new Promise<void>(() => null),
+              sign: (msg: string) => new Promise<Buffer>(() => ''),
             })
           }}
           sx={{ marginTop: '16px' }}

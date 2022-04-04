@@ -10,6 +10,8 @@ import {
 import TransportWebHid from '@ledgerhq/hw-transport-webhid'
 import TransportWebUsb from '@ledgerhq/hw-transport-webusb'
 import CosmosApp from '@ledgerhq/hw-app-cosmos'
+import Cosmos from 'ledger-cosmos-js'
+import Secp256k1 from 'secp256k1'
 
 const { PrivateKey, PublicKey } = Wallet
 const grpcUrl = 'https://laozi-testnet4.bandchain.org/grpc-web'
@@ -36,10 +38,7 @@ interface Wallet {
   publicKey: string
   address: string
   disconnect: () => Promise<void>
-  sign: (msg: string) => Promise<{
-    signature: Buffer | null
-    return_code: string | number
-  }>
+  sign: (msg: string) => Promise<Buffer>
 }
 
 const signHelper = async (tx: Transaction, wallet: Wallet) => {
@@ -48,8 +47,8 @@ const signHelper = async (tx: Transaction, wallet: Wallet) => {
     try {
       const pubKey = PublicKey.fromHex(wallet.publicKey)
       const signMsg = tx.getSignMessage().toString()
-      const { signature } = await wallet.sign(signMsg)
-      signedTx = tx.getTxData(signature as Buffer, pubKey)
+      const signature = await wallet.sign(signMsg)
+      signedTx = tx.getTxData(signature, pubKey, 127)
     } catch (err) {
       console.log(err)
     }
@@ -95,13 +94,15 @@ export const requestCryptoPrice = async (
   coinFeeLimit.setDenom('uband')
   coinFeeLimit.setAmount(String(feeLimit))
 
+  const senderAcc = wallet.address ? wallet.address : sender
+
   const requestMessage = new Message.MsgRequestData(
     oracleScriptId,
     encodedCallData,
     askCount,
     minCount,
     clientId,
-    sender,
+    senderAcc,
     [coinFeeLimit],
     prepareGas,
     executeGas
@@ -115,7 +116,6 @@ export const requestCryptoPrice = async (
   fee.setAmountList([feeCoin])
   fee.setGasLimit(1000000)
 
-  const senderAcc = wallet.address ? wallet.address : sender
   const chainId = await client.getChainId()
   const txn = new Transaction()
   txn.withMessages(requestMessage)
@@ -160,7 +160,6 @@ export const sendCoin = async (
   const senderAcc = wallet.address ? wallet.address : sender
   const msg = new Message.MsgSend(senderAcc, receiver, [sendAmount])
   const chainId = await client.getChainId()
-  const account = await client.getAccount(senderAcc)
 
   let feeCoin = new Coin()
   feeCoin.setDenom('uband')
@@ -172,15 +171,16 @@ export const sendCoin = async (
 
   const tx = new Transaction()
     .withMessages(msg)
-    .withAccountNum(account.accountNumber)
-    .withSequence(account.sequence)
     .withChainId(chainId)
     .withFee(fee)
+    .withMemo('')
+
+  await tx.withSender(client, senderAcc)
 
   const signedTx = await signHelper(tx, wallet)
 
   const response = await client.sendTxBlockMode(signedTx)
-  console.log(response)
+
   setLoading(false)
   return response
 }
@@ -215,7 +215,7 @@ export const delegateCoin = async (
   setLoading(true)
   const delegateAmount = new Coin()
   delegateAmount.setDenom('uband')
-  delegateAmount.setAmount(String(Number(amount) * (10 ^ 6)))
+  delegateAmount.setAmount(String(Number(amount) * 10 ** 6))
 
   let feeCoin = new Coin()
   feeCoin.setDenom('uband')
@@ -227,7 +227,6 @@ export const delegateCoin = async (
 
   const senderAcc = wallet.address ? wallet.address : sender
   const msg = new Message.MsgDelegate(senderAcc, validator, delegateAmount)
-  const account = await client.getAccount(senderAcc)
   const chainId = await client.getChainId()
 
   const tx = new Transaction()
@@ -235,13 +234,15 @@ export const delegateCoin = async (
     .withFee(fee)
     .withMemo(memo)
     .withChainId(chainId)
-    .withAccountNum(account.accountNumber)
-    .withSequence(account.sequence)
+
+  await tx.withSender(client, senderAcc)
 
   const signedTx = await signHelper(tx, wallet)
 
   const response = await client.sendTxBlockMode(signedTx)
+
   setLoading(false)
+
   return JSON.stringify(response, null, 2)
 }
 
@@ -251,20 +252,29 @@ export const connectLedger = async (isWindow: boolean) => {
       ? await TransportWebHid.create()
       : await TransportWebUsb.create()
     const disconnect = () => transport.close()
-    const cosmos = new CosmosApp(transport)
-    const address = await cosmos.getAddress('44/118/0/0/0', 'band')
-    const sign = async (msg: string) => await cosmos.sign('44/118/0/0/0', msg)
-    return { ...address, disconnect, sign }
+    const path = [44, 118, 0, 0, 0]
+    const cosmos = new Cosmos(transport)
+    const { bech32_address, compressed_pk } = await cosmos.getAddressAndPubKey(
+      path,
+      'band'
+    )
+    const sign = async (msg: string) => {
+      const { signature } = await cosmos.sign(path, msg)
+      return Buffer.from(Secp256k1.signatureImport(signature))
+    }
+    return {
+      address: bech32_address,
+      publicKey: Buffer.from(compressed_pk).toString('hex'),
+      disconnect,
+      sign,
+    }
   } catch (err) {
     alert(err)
     return {
       publicKey: '',
       address: '',
-      disconnect: () => new Promise(() => null),
-      sign: (msg: string) =>
-        new Promise<{ signature: Buffer | null; return_code: string | number }>(
-          () => ({ signature: null, return_code: '' })
-        ),
+      disconnect: () => new Promise<void>(() => null),
+      sign: (msg: string) => new Promise<Buffer>(() => ''),
     }
   }
 }
