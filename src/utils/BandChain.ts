@@ -9,7 +9,6 @@ import {
 } from '@bandprotocol/bandchain.js'
 import TransportWebHid from '@ledgerhq/hw-transport-webhid'
 import TransportWebUsb from '@ledgerhq/hw-transport-webusb'
-import CosmosApp from '@ledgerhq/hw-app-cosmos'
 import Cosmos from 'ledger-cosmos-js'
 import Secp256k1 from 'secp256k1'
 
