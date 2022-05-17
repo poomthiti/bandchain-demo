@@ -6,6 +6,7 @@ import {
   DelegateForm,
   SendCoinForm,
   LedgerConnect,
+  PdfTest,
 } from '../components'
 import { GetPairForm } from '../components/form/GetPairForm'
 
@@ -73,6 +74,7 @@ const Home = () => {
           id="delegate"
         />
         <Tab value="ledger" label="Ledger" id="ledger" />
+        <Tab value="pdf" label="pdf" id="pdf" />
       </Tabs>
       <TabContent value={value} tab="crypto">
         <CryptoRequestForm />
@@ -88,6 +90,9 @@ const Home = () => {
       </TabContent>
       <TabContent value={value} tab="ledger">
         <LedgerConnect />
+      </TabContent>
+      <TabContent value={value} tab="pdf">
+        <PdfTest />
       </TabContent>
     </Container>
   )
